@@ -12,15 +12,15 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var routes = <String, WidgetBuilder>{
-    ListScreen.routeName: (BuildContext context) => ListScreen(),
-    NewPostScreen.routeName: (BuildContext context) => NewPostScreen(),
-    DetailScreen.routeName: (BuildContext context) => DetailScreen()
+    ListScreen.routeName: (BuildContext context) => const ListScreen(),
+    NewPostScreen.routeName: (BuildContext context) => const NewPostScreen(),
+    DetailScreen.routeName: (BuildContext context) => const DetailScreen()
   };
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(primarySwatch: Colors.lightGreen),
       initialRoute: '/',
       routes: routes,
     );

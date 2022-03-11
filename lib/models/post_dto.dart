@@ -23,4 +23,8 @@ class PostDTO {
       'quantity': quantity
     });
   }
+
+  bool isValidQuantity(String value) {
+    return (value.isNotEmpty && int.parse(value) > 0);
+  }
 }
