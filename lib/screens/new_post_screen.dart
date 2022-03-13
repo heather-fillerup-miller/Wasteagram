@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import '../models/post_dto.dart';
 import '../widgets/semantics.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewPostScreen extends StatefulWidget {
   static const routeName = '/newPost';
@@ -19,6 +20,7 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
+  File imageFile = File('');
   var newPost = PostDTO();
   LocationData? locationData;
   var locationService = Location();
@@ -56,8 +58,36 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    File imageFile = ModalRoute.of(context)!.settings.arguments as File;
-    if (imageFile.path != '') {
+    if (imageFile.path == '') {
+      return AlertDialog(
+        title: Text('Choose option'),
+        content: SingleChildScrollView(
+            child: ListBody(
+          children: [
+            Divider(
+              height: 1,
+            ),
+            ListTile(
+              onTap: () {
+                _openGallery(context);
+              },
+              title: Text('Gallery'),
+              leading: Icon(Icons.account_box_outlined),
+            ),
+            Divider(
+              height: 1,
+            ),
+            ListTile(
+              onTap: () {
+                _openCamera(context);
+              },
+              title: Text('Camera'),
+              leading: Icon(Icons.camera),
+            )
+          ],
+        )),
+      );
+    } else {
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -68,7 +98,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
           ),
           body: Column(
             children: [
-              SizedBox(height: 200, width: 200, child: Image.file(imageFile)),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: SizedBox(
+                    height: 200, width: 200, child: Image.file(imageFile)),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Form(
@@ -107,9 +141,27 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   }),
             ],
           ));
-    } else {
-      return const Center(child: CircularProgressIndicator());
     }
+  }
+
+  /*
+* Pick an image from the gallery return 
+* the image as a file
+*/
+  void _openGallery(BuildContext context) async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      imageFile = File(pickedFile!.path);
+    });
+  }
+
+  void _openCamera(BuildContext context) async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    setState(() {
+      imageFile = File(pickedFile!.path);
+    });
   }
 
 /*

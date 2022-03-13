@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../screens/choose_image.dart';
 import '../models/post.dart';
+import '../screens/new_post_screen.dart';
 import '../widgets/wasteagram_post_tile.dart';
 
 class ListScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _ListScreenState extends State<ListScreen> {
             ),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, ChooseImage.routeName);
+                  Navigator.pushNamed(context, NewPostScreen.routeName);
                 },
                 child: const Icon(Icons.add_a_photo)),
             floatingActionButtonLocation:
@@ -71,7 +71,7 @@ class _ListScreenState extends State<ListScreen> {
                 ]),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, ChooseImage.routeName);
+                  Navigator.pushNamed(context, NewPostScreen.routeName);
                 },
                 child: const Icon(Icons.add_a_photo)),
             floatingActionButtonLocation:
