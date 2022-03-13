@@ -27,62 +27,32 @@ class _NewPostScreenState extends State<NewPostScreen> {
   final formKey = GlobalKey<FormState>();
 
   @override
-  void initState() {
-    super.initState();
-    retrieveLocation();
-  }
-
-  void retrieveLocation() async {
-    try {
-      var _serviceEnabled = await locationService.serviceEnabled();
-      if (!_serviceEnabled) {
-        _serviceEnabled = await locationService.requestService();
-        if (!_serviceEnabled) {
-          return;
-        }
-      }
-
-      var _permissionGranted = await locationService.hasPermission();
-      if (_permissionGranted == PermissionStatus.denied) {
-        _permissionGranted = await locationService.requestPermission();
-        if (_permissionGranted != PermissionStatus.granted) {}
-      }
-
-      locationData = await locationService.getLocation();
-    } on PlatformException catch (e) {
-      print('Error: ${e.toString()}, code: ${e.code}');
-      locationData = null;
-    }
-    locationData = await locationService.getLocation();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (imageFile.path == '') {
       return AlertDialog(
-        title: Text('Choose option'),
+        title: const Text('Choose option'),
         content: SingleChildScrollView(
             child: ListBody(
           children: [
-            Divider(
+            const Divider(
               height: 1,
             ),
             ListTile(
               onTap: () {
                 _openGallery(context);
               },
-              title: Text('Gallery'),
-              leading: Icon(Icons.account_box_outlined),
+              title: const Text('Gallery'),
+              leading: const Icon(Icons.account_box_outlined),
             ),
-            Divider(
+            const Divider(
               height: 1,
             ),
             ListTile(
               onTap: () {
                 _openCamera(context);
               },
-              title: Text('Camera'),
-              leading: Icon(Icons.camera),
+              title: const Text('Camera'),
+              leading: const Icon(Icons.camera),
             )
           ],
         )),
@@ -144,9 +114,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
     }
   }
 
-  /*
-* Pick an image from the gallery return 
-* the image as a file
+/*
+* Pick an image from the gallery
 */
   void _openGallery(BuildContext context) async {
     final pickedFile =
@@ -156,6 +125,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
     });
   }
 
+/*
+* Pick an image from the camera return 
+*/
   void _openCamera(BuildContext context) async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.camera);
@@ -165,17 +137,46 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
 /*
-* Upload the data into the firestore database using a data transfer object
+* Get Location
+*/
+
+  Future retrieveLocation() async {
+    try {
+      var _serviceEnabled = await locationService.serviceEnabled();
+      if (!_serviceEnabled) {
+        _serviceEnabled = await locationService.requestService();
+        if (!_serviceEnabled) {
+          return;
+        }
+      }
+
+      var _permissionGranted = await locationService.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await locationService.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {}
+      }
+
+      locationData = await locationService.getLocation();
+    } on PlatformException catch (e) {
+      print('Error: ${e.toString()}, code: ${e.code}');
+      locationData = null;
+    }
+    return locationService.getLocation();
+  }
+
+/*
+* Get Location and upload the data into the firestore database using a data transfer object
 */
   void uploadData(String value, File imageFile) async {
+    LocationData geolocation = await retrieveLocation();
     var fileName = DateTime.now().toString() + '.jpg';
     Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
     UploadTask uploadTask = storageReference.putFile(imageFile);
     await uploadTask;
     newPost.imageUrl = await storageReference.getDownloadURL();
     newPost.createDate = DateTime.now();
-    newPost.latitude = locationData?.latitude;
-    newPost.longitude = locationData?.longitude;
+    newPost.latitude = geolocation.latitude;
+    newPost.longitude = geolocation.longitude;
     newPost.quantity = int.parse(value);
     newPost.addDatabase();
   }
