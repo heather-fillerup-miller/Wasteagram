@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:location/location.dart';
 import '../models/post_dto.dart';
 import '../widgets/semantics.dart';
@@ -10,7 +10,9 @@ import '../widgets/semantics.dart';
 class NewPostScreen extends StatefulWidget {
   static const routeName = '/newPost';
 
-  const NewPostScreen({Key? key}) : super(key: key);
+  const NewPostScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<NewPostScreen> createState() => _NewPostScreenState();
@@ -18,8 +20,6 @@ class NewPostScreen extends StatefulWidget {
 
 class _NewPostScreenState extends State<NewPostScreen> {
   var newPost = PostDTO();
-  final picker = ImagePicker();
-  File imageFile = File('');
   LocationData? locationData;
   var locationService = Location();
   final formKey = GlobalKey<FormState>();
@@ -27,7 +27,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
   @override
   void initState() {
     super.initState();
-    getImage();
     retrieveLocation();
   }
 
@@ -57,6 +56,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    File imageFile = ModalRoute.of(context)!.settings.arguments as File;
     if (imageFile.path != '') {
       return Scaffold(
           appBar: AppBar(
@@ -81,13 +81,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
                               border: OutlineInputBorder()),
                           onSaved: (value) {
                             if (value != null) {
-                              uploadData(value);
+                              uploadData(value, imageFile);
                             }
                           },
                           validator: (value) {
                             if (value == null ||
                                 value.isEmpty ||
-                                newPost.isValidQuantity(value)) {
+                                !newPost.isValidQuantity(value)) {
                               return 'Enter a valid Quantity';
                             }
                             return null;
@@ -113,19 +113,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
 /*
-* Pick an image from the gallery return 
-* the image as a file
-*/
-  getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    imageFile = File(pickedFile!.path);
-    setState(() {});
-  }
-
-/*
 * Upload the data into the firestore database using a data transfer object
 */
-  void uploadData(String value) async {
+  void uploadData(String value, File imageFile) async {
     var fileName = DateTime.now().toString() + '.jpg';
     Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
     UploadTask uploadTask = storageReference.putFile(imageFile);
@@ -133,7 +123,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     newPost.imageUrl = await storageReference.getDownloadURL();
     newPost.createDate = DateTime.now();
     newPost.latitude = locationData?.latitude;
-    newPost.longitude = locationData?.latitude;
+    newPost.longitude = locationData?.longitude;
     newPost.quantity = int.parse(value);
     newPost.addDatabase();
   }

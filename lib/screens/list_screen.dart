@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:wasteagram/screens/new_post_screen.dart';
+import '../screens/choose_image.dart';
 import '../models/post.dart';
-import '../widgets/total_waste.dart';
 import '../widgets/wasteagram_post_tile.dart';
 
 class ListScreen extends StatefulWidget {
@@ -30,7 +29,8 @@ class _ListScreenState extends State<ListScreen> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text(getTotalWaste(snapshot.data!.docs) + ' - Wastegram'),
+              title: Text('Wastegram Posts - Total Waste: ' +
+                  getTotalWaste(snapshot.data!.docs)),
               leadingWidth: 100,
             ),
             body: Column(
@@ -52,7 +52,7 @@ class _ListScreenState extends State<ListScreen> {
             ),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, NewPostScreen.routeName);
+                  Navigator.pushNamed(context, ChooseImage.routeName);
                 },
                 child: const Icon(Icons.add_a_photo)),
             floatingActionButtonLocation:
@@ -62,7 +62,7 @@ class _ListScreenState extends State<ListScreen> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('Wastegram'),
+              title: const Text('Welcome to Wastegram!'),
             ),
             body: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +71,7 @@ class _ListScreenState extends State<ListScreen> {
                 ]),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, NewPostScreen.routeName);
+                  Navigator.pushNamed(context, ChooseImage.routeName);
                 },
                 child: const Icon(Icons.add_a_photo)),
             floatingActionButtonLocation:
