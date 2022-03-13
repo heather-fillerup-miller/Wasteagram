@@ -20,14 +20,13 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  File imageFile = File('');
-  var newPost = PostDTO();
-  LocationData? locationData;
-  var locationService = Location();
+  var imageFile = File('');
+  var newPost = PostDTO(); /*store temp data in DTO*/
   final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    /*Pick an image*/
     if (imageFile.path == '') {
       return AlertDialog(
         title: const Text('Choose option'),
@@ -57,7 +56,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
           ],
         )),
       );
-    } else {
+    }
+    /*Display Image and form*/
+    else {
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -139,8 +140,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
 /*
 * Get Location
 */
-
   Future retrieveLocation() async {
+    var locationService = Location();
+    LocationData locationData;
     try {
       var _serviceEnabled = await locationService.serviceEnabled();
       if (!_serviceEnabled) {
@@ -159,13 +161,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
       locationData = await locationService.getLocation();
     } on PlatformException catch (e) {
       print('Error: ${e.toString()}, code: ${e.code}');
-      locationData = null;
+      return null;
     }
-    return locationService.getLocation();
+    return locationData;
   }
 
 /*
-* Get Location and upload the data into the firestore database using a data transfer object
+* First get Location then store data in Post DTO finally upload the data 
+*  upload the DTO into the cloud storage and cloud firestore
 */
   void uploadData(String value, File imageFile) async {
     LocationData geolocation = await retrieveLocation();
